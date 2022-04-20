@@ -1,3 +1,13 @@
+<?php
+
+/**
+ * @var array $products
+ * @var array $categories
+ * @var array $time
+ * @var array $value
+ */
+
+?>
 <section class="promo">
     <h2 class="promo__title">Нужен стафф для катки?</h2>
     <p class="promo__text">На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное снаряжение.</p>
@@ -27,8 +37,12 @@
                             <span class="lot__amount">Стартовая цена</span>
                             <span class="lot__cost"><?= price_format(htmlspecialchars($value['price'])); ?></span>
                         </div>
-                        <div class="lot__timer timer">
-                            12:23
+                        <?php $time = remaining_time(htmlspecialchars($value['date_expiration']), date('H:i')); ?>
+                        <div class="lot__timer timer
+                            <?php if ($time[0] < 1) {
+                                echo 'timer--finishing';
+                            } ?>">
+                            <?= str_pad($time[0], 2, "0", STR_PAD_LEFT) ?>:<?= str_pad($time[1], 2, "0", STR_PAD_LEFT) ?>
                         </div>
                     </div>
                 </div>
