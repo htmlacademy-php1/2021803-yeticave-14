@@ -11,6 +11,5 @@ function remaining_time(string $closeTime, string $nowTime): array
     }
     $hours = floor($dt_diff / 3600);
     $minutes = floor($dt_diff % 3600 / 60);
-    $time = [$hours, $minutes];
-    return $time;
+    return [$hours, $minutes];
 }
