@@ -40,7 +40,7 @@ $products = [
         'date_expiration' => '2022-05-12'
     ],
     [
-        'title' => 'Куртка для сноуборда DC Mutiny Charocal',
+        'title' => 'Маска Oakley Canopy',
         'categorie' => $categories[5],
         'price' => '5400',
         'gif' => 'img/lot-6.jpg',
