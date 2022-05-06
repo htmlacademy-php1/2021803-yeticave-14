@@ -13,15 +13,10 @@ function remaining_time(string $closeTime, string $nowTime): array
     $minutes = floor($dt_diff % 3600 / 60);
     return [$hours, $minutes];
 }
-//Получение списка новых лотов
-function get_lots(mysqli $link): array
+
+//Проверка на ошибку SQL-запроса
+function error_check(mysqli $link, $result): array
 {
-    $sql = "SELECT l.*,c.name as cat_name 
-FROM lot l
-JOIN category c ON c.id=l.category_id
-WHERE l.finished_date > CURDATE()
-ORDER by l.created_date DESC LIMIT 6";
-    $result = mysqli_query($link, $sql);
     if ($result) {
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
     } else {
@@ -29,14 +24,20 @@ ORDER by l.created_date DESC LIMIT 6";
     }
 }
 
+//Получение списка новых лотов
+function get_lots(mysqli $link)
+{
+    $sql = "SELECT l.*,c.name as cat_name 
+FROM lot l
+JOIN category c ON c.id=l.category_id
+WHERE l.finished_date > CURDATE()
+ORDER by l.created_date DESC LIMIT 6";
+    return error_check($link, mysqli_query($link, $sql));
+}
+
 //Получение списка категорий
-function get_cat(mysqli $link): array
+function get_categories(mysqli $link)
 {
     $sql = "SELECT * FROM category";
-    $result = mysqli_query($link, $sql);
-    if ($result) {
-        return mysqli_fetch_all($result, MYSQLI_ASSOC);
-    } else {
-        print("Error MySQL: " . mysqli_error($link));
-    }
+    return  error_check($link, mysqli_query($link, $sql));
 }
