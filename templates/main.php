@@ -37,7 +37,7 @@
                             <span class="lot__amount">Стартовая цена</span>
                             <span class="lot__cost"><?= price_format(htmlspecialchars($value['initial_price'])); ?></span>
                         </div>
-                        <?php $time = remaining_time(htmlspecialchars($value['finished_date']), htmlspecialchars($value['created_date'])); ?>
+                        <?php $time = remaining_time(htmlspecialchars($value['finished_date']), date('Y-m-d H:i:s')); ?>
                         <div class="lot__timer timer
                             <?php if ($time[0] < 1) {
                                 echo 'timer--finishing';
