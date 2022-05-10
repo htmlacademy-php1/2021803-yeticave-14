@@ -14,12 +14,13 @@ function remaining_time(string $closeTime, string $nowTime): array
     return [$hours, $minutes];
 }
 
-//Проверка на ошибку SQL-запроса
-function error_check(mysqli $link, $result): array
+//Получение результата SQL-запроса
+function get_query_sql_results(mysqli $link, $result): array
 {
     if ($result) {
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
     } else {
+        return null;
         print("Error MySQL: " . mysqli_error($link));
     }
 }
@@ -32,12 +33,12 @@ FROM lot l
 JOIN category c ON c.id=l.category_id
 WHERE l.finished_date > CURDATE()
 ORDER by l.created_date DESC LIMIT 6";
-    return error_check($link, mysqli_query($link, $sql));
+    return get_query_sql_results($link, mysqli_query($link, $sql));
 }
 
 //Получение списка категорий
 function get_categories(mysqli $link)
 {
     $sql = "SELECT * FROM category";
-    return  error_check($link, mysqli_query($link, $sql));
+    return  get_query_sql_results($link, mysqli_query($link, $sql));
 }
