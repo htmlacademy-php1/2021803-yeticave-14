@@ -7,7 +7,7 @@ function remaining_time(string $closeTime, string $nowTime): array
 {
     $dt_diff = strtotime($closeTime) - strtotime($nowTime);
     if (!is_date_valid($closeTime) || $dt_diff < 0) {
-        return [0, 0];
+        return [];
     }
     $hours = floor($dt_diff / 3600);
     $minutes = floor($dt_diff % 3600 / 60);
@@ -20,8 +20,8 @@ function get_query_sql_results(mysqli $link, $result): array
     if ($result) {
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
     } else {
-        return null;
         print("Error MySQL: " . mysqli_error($link));
+        return null;
     }
 }
 
@@ -41,4 +41,12 @@ function get_categories(mysqli $link)
 {
     $sql = "SELECT * FROM category";
     return  get_query_sql_results($link, mysqli_query($link, $sql));
+}
+
+function get_lot_id(mysqli $link, int $lot_id)
+{
+    $sql = 'SELECT l.*, c.name as cat_name FROM lot l
+JOIN category c ON c.id=l.category_id
+WHERE l.id=' . $lot_id;
+    return get_query_sql_results($link, mysqli_query($link, $sql));
 }
