@@ -1,9 +1,17 @@
+<?php
+
+/**
+ * @var array $categories
+ */
+
+?>
+
 <main>
     <nav class="nav">
         <ul class="nav__list container">
             <?php foreach ($categories as $val) : ?>
                 <li class="nav__item">
-                    <a href="pages/all-lots.html"><?= htmlspecialchars($val['name']); ?></a>
+                    <a href="/all-lots.php?category=<?= $val['symbol_code']; ?>"><?= htmlspecialchars($val['name']); ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
