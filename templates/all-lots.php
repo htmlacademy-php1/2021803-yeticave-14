@@ -19,11 +19,7 @@
     </nav>
     <section class="lots container">
         <div class="lots__header">
-            <?php foreach ($categories as $val) : ?>
-                <?php if ($lots_category === $val['symbol_code']) : ?>
-                    <h2>Все лоты в категории <?= '«' . $val['name'] . '»'; ?></h2>
-                <?php endif; ?>
-            <?php endforeach; ?>
+            <h2>Все лоты в категории <?= '«' . $category['name'] . '»'; ?></h2>
         </div>
         <ul class="lots__list">
             <?php foreach ($lot as $value) : ?>

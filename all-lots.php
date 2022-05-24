@@ -20,22 +20,23 @@ if (!$lots_category) {
 } else {
     $categories = get_categories($link);
     $lot = get_lot_category($link, $lots_category);
+    $category = get_categories_symbol_code($link, $lots_category);
     if (!$lot) {
-        $page_content = include_template('all-lots.php', ['lot' => $lot, 'categories' => $categories, 'lots_category' => $lots_category]);
+        $page_content = include_template('all-lots.php', ['lot' => $lot, 'categories' => $categories, 'lots_category' => $lots_category, 'category' => $category]);
         $layout_content = include_template('layout.php', [
             'content' => $page_content,
             'categories' => $categories,
-            'title' => 'Инструменты',
+            'title' => $category,
             'user_name' => $user_name,
             'is_auth' => $is_auth
         ]);
         print($layout_content);
     } else {
-        $page_content = include_template('all-lots.php', ['lot' => $lot, 'categories' => $categories, 'lots_category' => $lots_category]);
+        $page_content = include_template('all-lots.php', ['lot' => $lot, 'categories' => $categories, 'lots_category' => $lots_category, 'category' => $category]);
         $layout_content = include_template('layout.php', [
             'content' => $page_content,
             'categories' => $categories,
-            'title' => $lot[0]['name_category'],
+            'title' => $category,
             'user_name' => $user_name,
             'is_auth' => $is_auth
         ]);

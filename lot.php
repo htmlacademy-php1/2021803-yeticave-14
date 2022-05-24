@@ -27,7 +27,7 @@ if (!$lot_id) {
     $layout_content = include_template('layout.php', [
         'content' => $page_content,
         'categories' => $categories,
-        'title' => $lot[0]['name'],
+        'title' => $lot['name'],
         'user_name' => $user_name,
         'is_auth' => $is_auth
     ]);
