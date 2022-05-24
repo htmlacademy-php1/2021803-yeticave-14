@@ -1,5 +1,5 @@
 <?php
-function price_format($price)
+function price_format($price): string
 {
     return number_format(ceil($price), 0, '', ' ') . ' ₽';
 }
@@ -7,7 +7,7 @@ function remaining_time(string $closeTime, string $nowTime): array
 {
     $dt_diff = strtotime($closeTime) - strtotime($nowTime);
     if (!is_date_valid($closeTime) || $dt_diff < 0) {
-        return [0, 0];
+        return [];
     }
     $hours = floor($dt_diff / 3600);
     $minutes = floor($dt_diff % 3600 / 60);
@@ -20,13 +20,13 @@ function get_query_sql_results(mysqli $link, $result): array
     if ($result) {
         return mysqli_fetch_all($result, MYSQLI_ASSOC);
     } else {
-        return null;
         print("Error MySQL: " . mysqli_error($link));
+        return [];
     }
 }
 
 //Получение списка новых лотов
-function get_lots(mysqli $link)
+function get_lots(mysqli $link): array
 {
     $sql = "SELECT l.*,c.name as cat_name 
 FROM lot l
@@ -37,8 +37,26 @@ ORDER by l.created_date DESC LIMIT 6";
 }
 
 //Получение списка категорий
-function get_categories(mysqli $link)
+function get_categories(mysqli $link): array
 {
     $sql = "SELECT * FROM category";
     return  get_query_sql_results($link, mysqli_query($link, $sql));
+}
+//Получение лота по его ID
+function get_lot_id(mysqli $link, int $lot_id): array
+{
+    $sql = "SELECT l.*, c.name as cat_name,IFNULL(MAX(b.price),l.initial_price) as max_price FROM lot l
+JOIN category c ON c.id=l.category_id
+LEFT JOIN bid b ON l.id=b.lot_id
+WHERE l.id= '" . $lot_id . "' 
+GROUP BY l.id";
+    return get_query_sql_results($link, mysqli_query($link, $sql));
+}
+//Получение списка лотов по категории
+function get_lot_category(mysqli $link, string $lots_category): array
+{
+    $sql = "SELECT l.*,c.name as name_category,c.symbol_code FROM lot l
+JOIN category c ON c.id=l.category_id
+WHERE c.symbol_code= '$lots_category'";
+    return get_query_sql_results($link, mysqli_query($link, $sql));
 }
