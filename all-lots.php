@@ -36,7 +36,7 @@ if (!$lots_category) {
         $layout_content = include_template('layout.php', [
             'content' => $page_content,
             'categories' => $categories,
-            'title' => $category,
+            'title' => $category['name'],
             'user_name' => $user_name,
             'is_auth' => $is_auth
         ]);
