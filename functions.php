@@ -1,13 +1,15 @@
 <?php
+//Приводят цену в верный формат
 function price_format($price): string
 {
     return number_format(ceil($price), 0, '', ' ') . ' ₽';
 }
+//Высчитывает разницу между датами чч:мм
 function remaining_time(string $closeTime, string $nowTime): array
 {
     $dt_diff = strtotime($closeTime) - strtotime($nowTime);
-    if (!is_date_valid($closeTime) || $dt_diff < 0) {
-        return [];
+    if ($dt_diff < 0) {
+        return [0, 0];
     }
     $hours = floor($dt_diff / 3600);
     $minutes = floor($dt_diff % 3600 / 60);
@@ -88,7 +90,7 @@ function getPostVal($value): ?string
 }
 
 //Проверка заполненности 
-function validateFilled($name)
+function validate_filled($name)
 {
     if (empty($_POST[$name])) {
         return "Это поле должно быть заполнено";
@@ -96,7 +98,7 @@ function validateFilled($name)
 }
 
 //Проверка категории
-function validateCategory($id, $categories)
+function validate_category($id, $categories)
 {
     if (!in_array($id, $categories)) {
         return "Указана несуществующая категория";
@@ -105,22 +107,110 @@ function validateCategory($id, $categories)
     return null;
 }
 
-//Проверка длины
-function validateLength($name, $min, $max): string
+//Добавление лота
+function add_lot(mysqli $link, array $lot, $files): bool
 {
-    $len = strlen($_POST[$name]);
+    $lot['finished_date'] = date("Y-m-d", strtotime($lot['finished_date']));
+    $lot['img_url'] = upload_image($files);
 
-    if ($len < $min or $len > $max) {
-        return "Значение должно быть от $min до $max символов";
+    $sql = 'INSERT INTO lot (user_id,name,category_id,created_date,finished_date,description,img_url,initial_price,bid_step) VALUES (3,?,?, NOW(),?,?,?,?,?)';
+    $stmt = db_get_prepare_stmt($link, $sql, $lot);
+    return mysqli_stmt_execute($stmt);
+}
+
+//Добавление картинки
+function upload_image($file): string
+{
+    $temp_name = $file['img_url']['tmp_name'];
+    $file_type = mime_content_type($temp_name);
+    if ($file_type === 'image/png') {
+        $file_name = uniqid() . '.png';
+    } elseif ($file_type === 'image/jpeg') {
+        $file_name = uniqid() . '.jpeg';
+    } else {
+        return '';
+    }
+    move_uploaded_file($temp_name, 'uploads/' . $file_name);
+    return 'uploads/' . $file_name;
+}
+
+//Проверка формата картинки
+function validate_img(array $files): string
+{
+    if (empty($files['img_url']['name'])) {
+        return 'Загрузите картинку';
+    }
+    $temp_name = $files['img_url']['tmp_name'];
+    $file_type = mime_content_type($temp_name);
+    if ($file_type !== 'image/png' && $file_type !== 'image/jpeg') {
+        return 'Загрузите картинку в формате .png или .jpeg';
+    } else {
+        return '';
     }
 }
 
-function addLot(mysqli $link, array $lot, $files): bool
+//Проверка цены
+function validate_price(string $price): ?string
 {
-    $lot['finished_date'] = date("Y-m-d H:i:s", strtotime($lot['finished_date']));
-    $lot['img_url'] = uploadFile($files);
+    if (intval($price) <= 0) {
+        return "Значение должно быть больше нуля";
+    }
+    return null;
+}
 
-    $sql = 'INSERT INTO lot (user_id,category_id,finished_date,description,img_url,initial_price,bid_step) VALUES (3,?,?,?,?,?,?)';
-    $stmt = db_get_prepare_stmt($link, $sql, $lot);
-    return mysqli_stmt_execute($stmt);
+//Проверка даты
+function validate_date(string $finished_date): string
+{
+    if (!is_date_valid($finished_date)) {
+        return "Дата должна быть в формате «ГГГГ-ММ-ДД»";
+    }
+    $time = remaining_time($finished_date, 'now');
+    if ($time[0] < 24) {
+        return "Дата должна быть больше текущей даты, хотя бы на один день";
+    }
+    return '';
+}
+//Проверка шага ставки
+function validate_bid_step(string $bid_step): ?string
+{
+    if (!ctype_digit($bid_step)) {
+        return "Значение должно быть целым числом и больше нуля";
+    }
+    return null;
+}
+//Проверка полей
+function validate_form_add_lot(array $lot, array $categories, $files): array
+{
+
+    $required_fields = ['name', 'category_id', 'description', 'img_url', 'initial_price', 'bid_step', 'finished_date'];
+    $errors = [];
+
+    $rules = [
+        'category_id' => function ($category_id) use ($categories) {
+            return validate_category($category_id, $categories);
+        },
+        'initial_price' => function ($initial_price) {
+            return validate_price($initial_price);
+        },
+        'bid_step' => function ($bid_step) {
+            return validate_bid_step($bid_step);
+        },
+        'finished_date' => function ($finished_date) {
+            return validate_date($finished_date);
+        }
+    ];
+    foreach ($required_fields as $field) {
+        if (empty($_POST[$field])) {
+            $errors[$field] = 'Поле не заполнено';
+        }
+    }
+
+    foreach ($lot as $key => $value) {
+        if (isset($rules[$key])) {
+            $rule = $rules[$key];
+            $errors[$key] = $rule($value);
+        }
+    }
+    $errors['img_url'] = validate_img($files);
+    return $errors;
 }
