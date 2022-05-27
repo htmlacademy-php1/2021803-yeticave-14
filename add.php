@@ -44,4 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'is_auth' => $is_auth
     ]);
     print($layout_content);
+} else {
+    $page_content = include_template('add.php', ['categories' => $categories);
+    $layout_content = include_template('layout.php', [
+        'content' => $page_content,
+        'categories' => $categories,
+        'title' => 'Добавление лота',
+        'user_name' => $user_name,
+        'is_auth' => $is_auth
+    ]);
+    print($layout_content);
 }
