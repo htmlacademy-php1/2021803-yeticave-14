@@ -44,9 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'is_auth' => $is_auth
     ]);
     print($layout_content);
-<<<<<<< HEAD
 } else {
-    $page_content = include_template('add.php', ['categories' => $categories);
+    $page_content = include_template('add.php', ['categories' => $categories]);
     $layout_content = include_template('layout.php', [
         'content' => $page_content,
         'categories' => $categories,
@@ -55,6 +54,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'is_auth' => $is_auth
     ]);
     print($layout_content);
-=======
->>>>>>> d219b9b08cfa78ca02e4568ac8c06f3e74f95926
 }
